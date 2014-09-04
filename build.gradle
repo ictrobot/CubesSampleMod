@@ -1,0 +1,72 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
+apply plugin: 'java'
+
+sourceSets.main.java.srcDirs = ["src/"]
+
+version = '1.0'
+
+ext {
+    modularworldVersion = '0.0.1'
+    modClass = 'example.MyMod'
+    androidSdkDir = System.getenv("ANDROID_HOME")
+
+    if (androidSdkDir == null) {
+        Properties localProps = new Properties()
+        localProps.load(new FileInputStream(file('local.properties')))
+
+        androidSdkDir = localProps['sdk.dir']
+    }
+
+    buildToolsVersion = '18.0.1'
+    compileSdkVersion = 18
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://raw.githubusercontent.com/ictrobot/mvn-repo/master/' }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+    maven { url 'https://oss.sonatype.org/content/repositories/releases/' }
+}
+
+dependencies {
+    compile "ethanjones.modularworld:core:$modularworldVersion"
+}
+
+jar.archiveName = 'mod.jar'
+
+task modDex(dependsOn: jar) << {
+    new File(getBuildDir(), '/libs/').mkdirs()
+    def props = new Properties()
+    props.load(new URL("https://raw.githubusercontent.com/ictrobot/mvn-repo/master/ethanjones/modularworld/core/$modularworldVersion/core-$modularworldVersion-properties.properties").newReader())
+    def buildToolsVersion = props.getProperty('androidBuildToolsVersion');
+
+    if (!new File("${androidSdkDir}/build-tools/${buildToolsVersion}/").exists()) {
+        println "You need build-tools ${buildToolsVersion}"
+        System.exit(1)
+    }
+
+    String cmdExt = Os.isFamily(Os.FAMILY_WINDOWS) ? '.bat' : ''
+
+    exec {
+        commandLine "${androidSdkDir}/build-tools/${buildToolsVersion}/dx${cmdExt}", '--dex',
+                "--output=${buildDir}/libs/mod.dex",
+                "--verbose",
+                "${buildDir}/libs/mod.jar"
+    }
+}
+
+task modProperties {
+    new File(getBuildDir(), '/libs/').mkdirs()
+    def props = new Properties()
+    props.setProperty('modClass', modClass)
+    props.store(new File(getBuildDir(), '/libs/mod.properties').newPrintWriter(), null)
+}
+
+task dist(type: Zip, dependsOn: ['modProperties', 'modDex', 'jar']) {
+    destinationDir = new File(getBuildDir(), '/libs/')
+    archiveName = project.name + '-' + project.version + '.mod'
+    from new File(getBuildDir(), '/libs/mod.jar')
+    from new File(getBuildDir(), '/libs/mod.dex')
+    from new File(getBuildDir(), '/libs/mod.properties')
+}
