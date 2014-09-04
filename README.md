@@ -1,7 +1,7 @@
 ModularWorldSampleMod
 =====================
 
-This is a sample mod for [ModularWorld](https://github.com/ictrobot/ModularWorld). Simply add your code and run 
+This is a sample mod for [ModularWorld](https://github.com/ictrobot/ModularWorld). Simply add your code to the 'src/' folder and assets to the 'assets/' folder then run 
 ```
 gradlew dist
 ```
