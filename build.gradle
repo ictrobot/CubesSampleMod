@@ -2,13 +2,13 @@ import org.apache.tools.ant.taskdefs.condition.Os
 
 apply plugin: 'java'
 
-sourceSets.main.java.srcDirs = ["src/"]
-
 version = '1.0'
+sourceSets.main.java.srcDirs = ["src/"]
 
 ext {
     modularworldVersion = '0.0.1'
     modClass = 'example.MyMod'
+    assetFolder = new File("assets/")
     androidSdkDir = System.getenv("ANDROID_HOME")
 
     if (androidSdkDir == null) {
@@ -69,4 +69,5 @@ task dist(type: Zip, dependsOn: ['modProperties', 'modDex', 'jar']) {
     from new File(getBuildDir(), '/libs/mod.jar')
     from new File(getBuildDir(), '/libs/mod.dex')
     from new File(getBuildDir(), '/libs/mod.properties')
+    from assetFolder
 }
