@@ -6,9 +6,9 @@ version = '1.0'
 sourceSets.main.java.srcDirs = ["src/"]
 
 ext {
-    modularworldVersion = '0.0.1'
+    cubesVersion = '0.0.1'
     modClass = 'example.MyMod'
-    assetFolder = new File("assets/")
+    assetsFolder = 'assets/'
     androidSdkDir = System.getenv("ANDROID_HOME")
 
     if (androidSdkDir == null) {
@@ -30,7 +30,7 @@ repositories {
 }
 
 dependencies {
-    compile "ethanjones.modularworld:core:$modularworldVersion"
+    compile "ethanjones.cubes:core:$cubesVersion"
 }
 
 jar.archiveName = 'mod.jar'
@@ -38,12 +38,11 @@ jar.archiveName = 'mod.jar'
 task modDex(dependsOn: jar) << {
     new File(getBuildDir(), '/libs/').mkdirs()
     def props = new Properties()
-    props.load(new URL("https://raw.githubusercontent.com/ictrobot/mvn-repo/master/ethanjones/modularworld/core/$modularworldVersion/core-$modularworldVersion-properties.properties").newReader())
+    props.load(new URL("https://raw.githubusercontent.com/ictrobot/mvn-repo/master/ethanjones/cubes/core/$cubesVersion/core-$cubesVersion-properties.properties").newReader())
     def buildToolsVersion = props.getProperty('androidBuildToolsVersion');
 
     if (!new File("${androidSdkDir}/build-tools/${buildToolsVersion}/").exists()) {
-        println "You need build-tools ${buildToolsVersion}"
-        System.exit(1)
+        throw new GradleException("You need build-tools ${buildToolsVersion}")
     }
 
     String cmdExt = Os.isFamily(Os.FAMILY_WINDOWS) ? '.bat' : ''
@@ -63,11 +62,13 @@ task modProperties {
     props.store(new File(getBuildDir(), '/libs/mod.properties').newPrintWriter(), null)
 }
 
-task dist(type: Zip, dependsOn: ['modProperties', 'modDex', 'jar']) {
+task cm(type: Zip, dependsOn: ['modProperties', 'modDex', 'jar']) {
     destinationDir = new File(getBuildDir(), '/libs/')
-    archiveName = project.name + '-' + project.version + '.mod'
-    from new File(getBuildDir(), '/libs/mod.jar')
-    from new File(getBuildDir(), '/libs/mod.dex')
-    from new File(getBuildDir(), '/libs/mod.properties')
-    from assetFolder
+    archiveName = project.name + '-' + project.version + '.cm'
+    from(new File(getBuildDir(), '/libs/mod.jar'))
+    from(new File(getBuildDir(), '/libs/mod.dex'))
+    from(new File(getBuildDir(), '/libs/mod.properties'))
+    into('assets') {
+        from(new File(assetsFolder))
+    }
 }
