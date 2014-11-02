@@ -8,6 +8,7 @@ sourceSets.main.java.srcDirs = ["src/"]
 ext {
     cubesVersion = '0.0.1'
     modClass = 'example.MyMod'
+    modName = 'MyMod'
     assetsFolder = 'assets/'
     androidSdkDir = System.getenv("ANDROID_HOME")
 
@@ -17,9 +18,6 @@ ext {
 
         androidSdkDir = localProps['sdk.dir']
     }
-
-    buildToolsVersion = '18.0.1'
-    compileSdkVersion = 18
 }
 
 repositories {
@@ -59,12 +57,13 @@ task modProperties {
     new File(getBuildDir(), '/libs/').mkdirs()
     def props = new Properties()
     props.setProperty('modClass', modClass)
+    props.setProperty('modName', modName)
     props.store(new File(getBuildDir(), '/libs/mod.properties').newPrintWriter(), null)
 }
 
 task cm(type: Zip, dependsOn: ['modProperties', 'modDex', 'jar']) {
     destinationDir = new File(getBuildDir(), '/libs/')
-    archiveName = project.name + '-' + project.version + '.cm'
+    archiveName = modName + '.cm'
     from(new File(getBuildDir(), '/libs/mod.jar'))
     from(new File(getBuildDir(), '/libs/mod.dex'))
     from(new File(getBuildDir(), '/libs/mod.properties'))
