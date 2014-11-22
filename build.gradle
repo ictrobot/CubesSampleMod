@@ -1,22 +1,24 @@
 import org.apache.tools.ant.taskdefs.condition.Os
 
 apply plugin: 'java'
+sourceCompatibility = 1.7
 
 version = '1.0'
 sourceSets.main.java.srcDirs = ["src/"]
 
 ext {
     cubesVersion = '0.0.1'
+    androidBuildToolsVersion = '21.1.0';
     modClass = 'example.MyMod'
     modName = 'MyMod'
     assetsFolder = 'assets/'
-    androidSdkDir = System.getenv("ANDROID_HOME")
+    androidSDKDir = System.getenv("ANDROID_HOME")
 
-    if (androidSdkDir == null) {
+    if (androidSDKDir == null) {
         Properties localProps = new Properties()
         localProps.load(new FileInputStream(file('local.properties')))
 
-        androidSdkDir = localProps['sdk.dir']
+        androidSDKDir = localProps['sdk.dir']
     }
 }
 
@@ -36,18 +38,15 @@ jar.archiveName = 'mod.jar'
 
 task modDex(dependsOn: jar) << {
     new File(getBuildDir(), '/libs/').mkdirs()
-    def props = new Properties()
-    props.load(new URL("https://raw.githubusercontent.com/ictrobot/mvn-repo/master/ethanjones/cubes/core/$cubesVersion/core-$cubesVersion-properties.properties").newReader())
-    def buildToolsVersion = props.getProperty('androidBuildToolsVersion');
 
-    if (!new File("${androidSdkDir}/build-tools/${buildToolsVersion}/").exists()) {
-        throw new GradleException("You need build-tools ${buildToolsVersion}")
+    if (!new File("${androidSDKDir}/build-tools/${androidBuildToolsVersion}/").exists()) {
+        throw new GradleException("You need build-tools ${androidBuildToolsVersion}")
     }
 
     String cmdExt = Os.isFamily(Os.FAMILY_WINDOWS) ? '.bat' : ''
 
     exec {
-        commandLine "${androidSdkDir}/build-tools/${buildToolsVersion}/dx${cmdExt}", '--dex',
+        commandLine "${androidSDKDir}/build-tools/${androidBuildToolsVersion}/dx${cmdExt}", '--dex',
                 "--output=${buildDir}/libs/mod.dex",
                 "--verbose",
                 "${buildDir}/libs/mod.jar"
