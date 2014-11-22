@@ -22,9 +22,10 @@ ext {
 
 repositories {
     mavenCentral()
-    maven { url 'https://raw.githubusercontent.com/ictrobot/mvn-repo/master/' }
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://oss.sonatype.org/content/repositories/releases/' }
+    maven { url "https://raw.githubusercontent.com/ictrobot/mvn-repo/master/snapshots" }
+    maven { url "https://raw.githubusercontent.com/ictrobot/mvn-repo/master/releases" }
 }
 
 dependencies {
