@@ -7,7 +7,7 @@ version = '1.0'
 sourceSets.main.java.srcDirs = ["src/"]
 
 ext {
-    cubesVersion = '0.0.1'
+    cubesVersion = '0.0.3-SNAPSHOT'
     androidBuildToolsVersion = '21.1.0';
     modClass = 'example.MyMod'
     modName = 'MyMod'
@@ -26,17 +26,34 @@ repositories {
     mavenCentral()
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://oss.sonatype.org/content/repositories/releases/' }
-    maven { url "https://raw.githubusercontent.com/ictrobot/mvn-repo/master/snapshots" }
-    maven { url "https://raw.githubusercontent.com/ictrobot/mvn-repo/master/releases" }
+    maven { url "http://ethanjones.me/maven/snapshots" }
+    maven { url "http://ethanjones.me/maven/releases" }
 }
 
 dependencies {
     compile "ethanjones.cubes:core:$cubesVersion"
 }
 
+task cubesProperties << {
+    File jar = configurations.compile.fileCollection{dep -> dep.group == 'ethanjones.cubes' && dep.name == 'core'}.first();
+    FileTree tree = zipTree(jar)
+    copy {
+        into getProject().getBuildDir()
+        includes ["core.properties"]
+        rename {return "cubes.properties"}
+        from tree
+    }
+    Properties cubes = new Properties();
+    cubes.load(new FileInputStream(new File(getProject().getBuildDir(), "cubes.properties")));
+    ext.cubes = cubes;
+    ext.androidBuildToolsVersion = cubes["ANDROID_BUILD_TOOLS"]
+    print("Cubes is using Android Build Tools " + ext.androidBuildToolsVersion)
+}
+
+
 jar.archiveName = 'mod.jar'
 
-task modDex(dependsOn: jar) << {
+task modDex(dependsOn: [jar, cubesProperties]) << {
     new File(getBuildDir(), '/libs/').mkdirs()
 
     if (!new File("${androidSDKDir}/build-tools/${androidBuildToolsVersion}/").exists()) {

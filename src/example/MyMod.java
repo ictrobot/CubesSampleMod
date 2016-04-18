@@ -1,7 +1,8 @@
 package example;
 
-import ethanjones.cubes.core.events.EventHandler;
-import ethanjones.cubes.core.events.world.generation.GenerationEvent;
+import ethanjones.cubes.core.IDManager;
+import ethanjones.cubes.core.event.EventHandler;
+import ethanjones.cubes.core.event.world.generation.GenerationEvent;
 import ethanjones.cubes.core.logging.Log;
 import ethanjones.cubes.core.mod.Mod;
 import ethanjones.cubes.core.mod.ModEventHandler;
@@ -31,12 +32,12 @@ public class MyMod {
 
   @ModEventHandler
   public void startingClient(StartingClientEvent event) {
-    Sided.getBlockManager().register(myBlock);          //Blocks have to registered in StartingClientEvent and StartingServerEvent
+    IDManager.register(myBlock);          //Blocks have to registered in StartingClientEvent and StartingServerEvent
   }
 
   @ModEventHandler
   public void startingServer(StartingServerEvent event) {
-    Sided.getBlockManager().register(myBlock);          //Blocks have to registered in StartingClientEvent and StartingServerEvent
+    IDManager.register(myBlock);          //Blocks have to registered in StartingClientEvent and StartingServerEvent
     Sided.getEventBus().register(this);                 //Sets this as an EventHandler server side
   }
 
@@ -44,15 +45,15 @@ public class MyMod {
   //The parameter tells Cubes the type of Event the method handles
   @EventHandler
   public void generationEvent(GenerationEvent event) {
-    if (event.getAreaReference().areaX != 0 || event.getAreaReference().areaY != 0 || event.getAreaReference().areaZ != 0) {
-      event.getArea().setBlock(myBlock, 7, 7, 7);
-      event.getArea().setBlock(myBlock, 7, 7, 8);
-      event.getArea().setBlock(myBlock, 8, 7, 7);
-      event.getArea().setBlock(myBlock, 8, 7, 8);
-      event.getArea().setBlock(myBlock, 7, 8, 7);
-      event.getArea().setBlock(myBlock, 7, 8, 8);
-      event.getArea().setBlock(myBlock, 8, 8, 7);
-      event.getArea().setBlock(myBlock, 8, 8, 8);
+    if (event.getAreaReference().areaX != 0 || event.getAreaReference().areaZ != 0) {
+      event.getArea().setBlock(myBlock, 7, 100, 7);
+      event.getArea().setBlock(myBlock, 7, 100, 8);
+      event.getArea().setBlock(myBlock, 8, 100, 7);
+      event.getArea().setBlock(myBlock, 8, 100, 8);
+      event.getArea().setBlock(myBlock, 7, 101, 7);
+      event.getArea().setBlock(myBlock, 7, 101, 8);
+      event.getArea().setBlock(myBlock, 8, 101, 7);
+      event.getArea().setBlock(myBlock, 8, 101, 8);
     }
   }
 }
