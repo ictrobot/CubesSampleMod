@@ -1,90 +1,21 @@
-import org.apache.tools.ant.taskdefs.condition.Os
-
+buildscript {
+    repositories {
+        maven { url "http://ethanjones.me/maven/snapshots" }
+        maven { url "http://ethanjones.me/maven/releases" }
+    }
+    dependencies {
+        classpath "ethanjones.cubes:modplugin:0.0.1-SNAPSHOT"
+    }
+}
 apply plugin: 'java'
-sourceCompatibility = 1.7
+apply plugin: 'cubes-mod'
 
-version = '1.0'
 sourceSets.main.java.srcDirs = ["src/"]
 
-ext {
+cubes {
     cubesVersion = '0.0.3-SNAPSHOT'
-    androidBuildToolsVersion = '21.1.0';
+    modVersion = '1.0'
     modClass = 'example.MyMod'
     modName = 'MyMod'
     assetsFolder = 'assets/'
-    androidSDKDir = System.getenv("ANDROID_HOME")
-
-    if (androidSDKDir == null) {
-        Properties localProps = new Properties()
-        localProps.load(new FileInputStream(file('local.properties')))
-
-        androidSDKDir = localProps['sdk.dir']
-    }
-}
-
-repositories {
-    mavenCentral()
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-    maven { url 'https://oss.sonatype.org/content/repositories/releases/' }
-    maven { url "http://ethanjones.me/maven/snapshots" }
-    maven { url "http://ethanjones.me/maven/releases" }
-}
-
-dependencies {
-    compile "ethanjones.cubes:core:$cubesVersion"
-}
-
-task cubesProperties << {
-    File jar = configurations.compile.fileCollection{dep -> dep.group == 'ethanjones.cubes' && dep.name == 'core'}.first();
-    FileTree tree = zipTree(jar)
-    copy {
-        into getProject().getBuildDir()
-        includes ["core.properties"]
-        rename {return "cubes.properties"}
-        from tree
-    }
-    Properties cubes = new Properties();
-    cubes.load(new FileInputStream(new File(getProject().getBuildDir(), "cubes.properties")));
-    ext.cubes = cubes;
-    ext.androidBuildToolsVersion = cubes["ANDROID_BUILD_TOOLS"]
-    print("Cubes is using Android Build Tools " + ext.androidBuildToolsVersion)
-}
-
-
-jar.archiveName = 'mod.jar'
-
-task modDex(dependsOn: [jar, cubesProperties]) << {
-    new File(getBuildDir(), '/libs/').mkdirs()
-
-    if (!new File("${androidSDKDir}/build-tools/${androidBuildToolsVersion}/").exists()) {
-        throw new GradleException("You need build-tools ${androidBuildToolsVersion}")
-    }
-
-    String cmdExt = Os.isFamily(Os.FAMILY_WINDOWS) ? '.bat' : ''
-
-    exec {
-        commandLine "${androidSDKDir}/build-tools/${androidBuildToolsVersion}/dx${cmdExt}", '--dex',
-                "--output=${buildDir}/libs/mod.dex",
-                "--verbose",
-                "${buildDir}/libs/mod.jar"
-    }
-}
-
-task modProperties {
-    new File(getBuildDir(), '/libs/').mkdirs()
-    def props = new Properties()
-    props.setProperty('modClass', modClass)
-    props.setProperty('modName', modName)
-    props.store(new File(getBuildDir(), '/libs/mod.properties').newPrintWriter(), null)
-}
-
-task cm(type: Zip, dependsOn: ['modProperties', 'modDex', 'jar']) {
-    destinationDir = new File(getBuildDir(), '/libs/')
-    archiveName = modName + '.cm'
-    from(new File(getBuildDir(), '/libs/mod.jar'))
-    from(new File(getBuildDir(), '/libs/mod.dex'))
-    from(new File(getBuildDir(), '/libs/mod.properties'))
-    into('assets') {
-        from(new File(assetsFolder))
-    }
 }
