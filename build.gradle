@@ -15,7 +15,7 @@ sourceSets.main.java.srcDirs = ["src/"]
 cubes {
     cubesVersion = '0.0.3-SNAPSHOT'
     modVersion = '1.0'
-    modClass = 'example.MyMod'
-    modName = 'MyMod'
+    modClass = 'sample.SampleMod'
+    modName = 'SampleMod'
     assetsFolder = 'assets/'
 }
