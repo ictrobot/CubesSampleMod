@@ -1,7 +1,7 @@
 package sample;
 
 import ethanjones.cubes.block.Block;
-import ethanjones.cubes.core.IDManager;
+import ethanjones.cubes.core.id.IDManager;
 import ethanjones.cubes.core.logging.Log;
 import ethanjones.cubes.core.mod.Mod;
 import ethanjones.cubes.core.mod.ModEventHandler;

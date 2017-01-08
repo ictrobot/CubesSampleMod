@@ -13,7 +13,7 @@ apply plugin: 'cubes-mod'
 sourceSets.main.java.srcDirs = ["src/"]
 
 cubes {
-    cubesVersion = '0.0.3-SNAPSHOT'
+    cubesVersion = '0.0.4'
     modVersion = '1.0'
     modClass = 'sample.SampleMod'
     modName = 'SampleMod'
