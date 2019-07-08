@@ -4,16 +4,14 @@ buildscript {
         maven { url "http://ethanjones.me/maven/releases" }
     }
     dependencies {
-        classpath "ethanjones.cubes:modplugin:0.0.2"
+        classpath "ethanjones.cubes:modplugin:0.0.3"
     }
 }
 apply plugin: 'java'
 apply plugin: 'cubes-mod'
 
-sourceSets.main.java.srcDirs = ["src/"]
-
 cubes {
-    cubesVersion = '0.0.6-SNAPSHOT'
+    cubesVersion = '0.0.7-SNAPSHOT'
     modVersion = '1.0'
     modClass = 'sample.SampleMod'
     modName = 'SampleMod'
